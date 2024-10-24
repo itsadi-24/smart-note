@@ -3,14 +3,14 @@ package main
 
 import (
     "bytes"
-    "encoding/base64"
     "encoding/json"
     "io/ioutil"
     "net/http"
+    "os"
     "strings"
     "github.com/gin-gonic/gin"
     "github.com/gin-contrib/cors"
-	"github.com/joho/godotenv"
+    "github.com/joho/godotenv"
 )
 
 type GeminiRequest struct {
@@ -35,7 +35,7 @@ type GeminiResponse struct {
     } `json:"candidates"`
 }
 
-func analyzeHandler(c *gin.Context) {
+func analyzeHandler(c *gin.Context,apiKey string) {
     var request struct {
         ImageData string `json:"imageData"`
     }
@@ -122,7 +122,17 @@ func analyzeHandler(c *gin.Context) {
 }
 
 func main() {
-	apiKey := os.Getenv("API_KEY")
+    // Load .env file
+    err := godotenv.Load()
+    if err != nil {
+        panic("Error loading .env file")
+    }
+
+    apiKey := os.Getenv("API_KEY")
+    if apiKey == "" {
+        panic("API_KEY not set in environment")
+    }
+
     r := gin.Default()
     r.Use(cors.New(cors.Config{
         AllowOrigins: []string{"http://localhost:3000"},
@@ -130,7 +140,10 @@ func main() {
         AllowHeaders: []string{"Content-Type"},
     }))
 
-    r.POST("/analyze", analyzeHandler)
+    // Modify the route handler to pass apiKey
+    r.POST("/analyze", func(c *gin.Context) {
+        analyzeHandler(c, apiKey)
+    })
     
     r.Run(":8080")
 }
