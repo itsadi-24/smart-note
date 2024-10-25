@@ -12,7 +12,9 @@ import {
 } from 'react-icons/fa';
 import Spinner from './Spinner';
 import toast, { Toaster } from 'react-hot-toast';
-
+import TopButtons from './TopButtons';
+import InfoModal from './InfoModal';
+import IntroAnimation from './IntroAnimation';
 const COLORS = [
   '#FFFFFF', // default
   '#FF9B9B',
@@ -45,6 +47,18 @@ export default function Canvas() {
   const [result, setResult] = useState<string>('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showInfo, setShowInfo] = useState(false);
+  const [showIntro, setShowIntro] = useState(true);
+
+  // Use localStorage to check if it's the first visit
+  useEffect(() => {
+    const hasVisited = localStorage.getItem('hasVisited');
+    if (hasVisited) {
+      setShowIntro(false);
+    } else {
+      localStorage.setItem('hasVisited', 'true');
+    }
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -314,152 +328,164 @@ export default function Canvas() {
   };
 
   return (
-    <div className='relative w-screen h-screen bg-[#1a1a1a]'>
-      <Toaster position='top-center' />
-
-      <canvas
-        ref={canvasRef}
-        onMouseDown={startDrawing}
-        onMouseMove={draw}
-        onMouseUp={stopDrawing}
-        onMouseLeave={stopDrawing}
-        onTouchStart={startDrawing}
-        onTouchMove={draw}
-        onTouchEnd={stopDrawing}
-        className='touch-none'
-      />
-
-      {/* Floating toolbar */}
-      <div className='fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-white/10 backdrop-blur-md rounded-full p-4 flex items-center gap-4'>
-        <button
-          onClick={() => setTool('pen')}
-          className={`p-2 rounded-full ${
-            tool === 'pen'
-              ? 'bg-blue-500 text-white'
-              : 'text-white hover:bg-white/20'
-          }`}
-          title='Pen tool'
-        >
-          <FaPen />
-        </button>
-        <button
-          onClick={() => setTool('eraser')}
-          className={`p-2 rounded-full ${
-            tool === 'eraser'
-              ? 'bg-blue-500 text-white'
-              : 'text-white hover:bg-white/20'
-          }`}
-          title='Eraser tool'
-        >
-          <FaEraser />
-        </button>
-
-        <div className='h-6 w-px bg-white/20' />
-
-        {COLORS.map((color) => (
-          <button
-            key={color}
-            onClick={() => {
-              setSelectedColor(color);
-              setTool('pen');
-            }}
-            className={`w-8 h-8 rounded-full ${
-              selectedColor === color && tool === 'pen'
-                ? 'ring-2 ring-blue-500'
-                : ''
-            }`}
-            style={{ backgroundColor: color }}
-          />
-        ))}
-
-        <div className='h-6 w-px bg-white/20' />
-
-        <input
-          type='range'
-          min='1'
-          max='20'
-          value={lineWidth}
-          onChange={(e) => setLineWidth(Number(e.target.value))}
-          className='w-32'
-          title='Line width'
+    <>
+      {showIntro && (
+        <IntroAnimation onAnimationComplete={() => setShowIntro(false)} />
+      )}
+      <div
+        className={`relative w-screen h-screen bg-[#1a1a1a] ${
+          showIntro
+            ? 'opacity-0'
+            : 'opacity-100 transition-opacity duration-500'
+        }`}
+      >
+        <Toaster position='top-center' />
+        <TopButtons onInfoClick={() => setShowInfo(true)} />
+        {showInfo && <InfoModal onClose={() => setShowInfo(false)} />}
+        <canvas
+          ref={canvasRef}
+          onMouseDown={startDrawing}
+          onMouseMove={draw}
+          onMouseUp={stopDrawing}
+          onMouseLeave={stopDrawing}
+          onTouchStart={startDrawing}
+          onTouchMove={draw}
+          onTouchEnd={stopDrawing}
+          className='touch-none'
         />
 
-        <div className='h-6 w-px bg-white/20' />
-
-        <button
-          onClick={undo}
-          disabled={undoStack.length === 0}
-          className='p-2 text-white disabled:opacity-50 hover:bg-white/20 rounded-full'
-          title='Undo'
-        >
-          <FaUndo />
-        </button>
-        <button
-          onClick={redo}
-          disabled={redoStack.length === 0}
-          className='p-2 text-white disabled:opacity-50 hover:bg-white/20 rounded-full'
-          title='Redo'
-        >
-          <FaRedo />
-        </button>
-
-        <div className='h-6 w-px bg-white/20' />
-
-        <button
-          onClick={downloadImage}
-          className='p-2 text-white hover:bg-white/20 rounded-full'
-          title='Download drawing'
-        >
-          <FaDownload />
-        </button>
-
-        <button
-          onClick={clearCanvas}
-          className='p-2 text-white hover:bg-white/20 rounded-full'
-          title='Clear canvas'
-        >
-          <FaTrash />
-        </button>
-
-        <button
-          onClick={analyzeDrawing}
-          disabled={isAnalyzing}
-          className={`px-4 py-2 ${
-            isAnalyzing ? 'bg-gray-500' : 'bg-green-500 hover:bg-green-600'
-          } text-white rounded-full flex items-center gap-2 transition-colors`}
-        >
-          {isAnalyzing ? <Spinner /> : <FaSearch />}
-          {isAnalyzing ? 'Analyzing...' : 'Analyze'}
-        </button>
-      </div>
-
-      {/* Results display */}
-      {(result || error) && (
-        <div className='fixed top-8 left-1/2 transform -translate-x-1/2 bg-white/10 backdrop-blur-md rounded-lg p-6 max-w-lg w-full animate-fade-in'>
-          <div className='flex justify-between items-start mb-4'>
-            <h3 className='text-white font-semibold text-lg'>
-              {error ? 'Error' : 'Analysis Result'}
-            </h3>
-            <button
-              onClick={() => {
-                setResult('');
-                setError(null);
-              }}
-              className='text-white/60 hover:text-white transition-colors'
-            >
-              <FaTimes />
-            </button>
-          </div>
-
-          <div
-            className={`text-white ${
-              error ? 'text-red-400' : ''
-            } result-scrollbar max-h-[60vh] overflow-y-auto`}
+        {/* Floating toolbar */}
+        <div className='fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-white/10 backdrop-blur-md rounded-full p-4 flex items-center gap-4'>
+          <button
+            onClick={() => setTool('pen')}
+            className={`p-2 rounded-full ${
+              tool === 'pen'
+                ? 'bg-blue-500 text-white'
+                : 'text-white hover:bg-white/20'
+            }`}
+            title='Pen tool'
           >
-            {error || result}
-          </div>
+            <FaPen />
+          </button>
+          <button
+            onClick={() => setTool('eraser')}
+            className={`p-2 rounded-full ${
+              tool === 'eraser'
+                ? 'bg-blue-500 text-white'
+                : 'text-white hover:bg-white/20'
+            }`}
+            title='Eraser tool'
+          >
+            <FaEraser />
+          </button>
+
+          <div className='h-6 w-px bg-white/20' />
+
+          {COLORS.map((color) => (
+            <button
+              key={color}
+              onClick={() => {
+                setSelectedColor(color);
+                setTool('pen');
+              }}
+              className={`w-8 h-8 rounded-full ${
+                selectedColor === color && tool === 'pen'
+                  ? 'ring-2 ring-blue-500'
+                  : ''
+              }`}
+              style={{ backgroundColor: color }}
+            />
+          ))}
+
+          <div className='h-6 w-px bg-white/20' />
+
+          <input
+            type='range'
+            min='1'
+            max='20'
+            value={lineWidth}
+            onChange={(e) => setLineWidth(Number(e.target.value))}
+            className='w-32'
+            title='Line width'
+          />
+
+          <div className='h-6 w-px bg-white/20' />
+
+          <button
+            onClick={undo}
+            disabled={undoStack.length === 0}
+            className='p-2 text-white disabled:opacity-50 hover:bg-white/20 rounded-full'
+            title='Undo'
+          >
+            <FaUndo />
+          </button>
+          <button
+            onClick={redo}
+            disabled={redoStack.length === 0}
+            className='p-2 text-white disabled:opacity-50 hover:bg-white/20 rounded-full'
+            title='Redo'
+          >
+            <FaRedo />
+          </button>
+
+          <div className='h-6 w-px bg-white/20' />
+
+          <button
+            onClick={downloadImage}
+            className='p-2 text-white hover:bg-white/20 rounded-full'
+            title='Download drawing'
+          >
+            <FaDownload />
+          </button>
+
+          <button
+            onClick={clearCanvas}
+            className='p-2 text-white hover:bg-white/20 rounded-full'
+            title='Clear canvas'
+          >
+            <FaTrash />
+          </button>
+
+          <button
+            onClick={analyzeDrawing}
+            disabled={isAnalyzing}
+            className={`px-4 py-2 ${
+              isAnalyzing ? 'bg-gray-500' : 'bg-green-500 hover:bg-green-600'
+            } text-white rounded-full flex items-center gap-2 transition-colors`}
+          >
+            {isAnalyzing ? <Spinner /> : <FaSearch />}
+            {isAnalyzing ? 'Analyzing...' : 'Analyze'}
+          </button>
         </div>
-      )}
-    </div>
+
+        {/* Results display */}
+        {(result || error) && (
+          <div className='fixed top-8 left-1/2 transform -translate-x-1/2 bg-white/10 backdrop-blur-md rounded-lg p-6 max-w-lg w-full animate-fade-in'>
+            <div className='flex justify-between items-start mb-4'>
+              <h3 className='text-white font-semibold text-lg'>
+                {error ? 'Error' : 'Analysis Result'}
+              </h3>
+              <button
+                onClick={() => {
+                  setResult('');
+                  setError(null);
+                }}
+                className='text-white/60 hover:text-white transition-colors'
+              >
+                <FaTimes />
+              </button>
+            </div>
+
+            <div
+              className={`text-white ${
+                error ? 'text-red-400' : ''
+              } result-scrollbar max-h-[60vh] overflow-y-auto`}
+            >
+              {error || result}
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 }
