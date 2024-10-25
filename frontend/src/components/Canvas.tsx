@@ -260,15 +260,23 @@ export default function Canvas() {
     toast.success('Image downloaded successfully!');
   };
 
+  // In Canvas.tsx, modify the analyzeDrawing function:
+
   const analyzeDrawing = async () => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas) {
+      toast.error('Canvas not found');
+      return;
+    }
 
     setIsAnalyzing(true);
     setError(null);
 
     try {
       const imageData = canvas.toDataURL('image/png');
+
+      // Log the request
+      console.log('Sending request to backend...');
 
       const response = await fetch('http://localhost:8080/analyze', {
         method: 'POST',
@@ -278,11 +286,16 @@ export default function Canvas() {
         body: JSON.stringify({ imageData }),
       });
 
-      if (!response.ok) {
-        throw new Error('Analysis failed');
-      }
+      // Log the response status
+      console.log('Response status:', response.status);
 
       const data = await response.json();
+      console.log('Response data:', data);
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Analysis failed');
+      }
+
       if (data.error) {
         throw new Error(data.error);
       }
@@ -292,6 +305,7 @@ export default function Canvas() {
     } catch (error) {
       const message =
         error instanceof Error ? error.message : 'Error analyzing image';
+      console.error('Analysis error:', error);
       setError(message);
       toast.error(message);
     } finally {
