@@ -14,13 +14,13 @@ import Spinner from './Spinner';
 import toast, { Toaster } from 'react-hot-toast';
 
 const COLORS = [
-  '#FFFFFF', // white for blackboard
-  '#FF9B9B', // soft red
-  '#B8FF9B', // soft green
-  '#9BB8FF', // soft blue
-  '#FFE79B', // soft yellow
-  '#FF9BE7', // soft pink
-  '#9BFFF6', // soft cyan
+  '#FFFFFF', // default
+  '#FF9B9B',
+  '#B8FF9B',
+  '#9BB8FF',
+  '#FFE79B',
+  '#FF9BE7',
+  '#9BFFF6',
 ];
 
 interface DrawAction {
@@ -276,7 +276,7 @@ export default function Canvas() {
       const imageData = canvas.toDataURL('image/png');
 
       // Log the request
-      console.log('Sending request to backend...');
+      // console.log('Sending request to backend...');
 
       const response = await fetch('http://localhost:8080/analyze', {
         method: 'POST',
@@ -287,7 +287,7 @@ export default function Canvas() {
       });
 
       // Log the response status
-      console.log('Response status:', response.status);
+      // console.log('Response status:', response.status);
 
       const data = await response.json();
       console.log('Response data:', data);
@@ -301,13 +301,13 @@ export default function Canvas() {
       }
 
       setResult(data.result);
-      toast.success('Analysis completed!');
+      // toast.success('Analysis completed!');
     } catch (error) {
       const message =
         error instanceof Error ? error.message : 'Error analyzing image';
       console.error('Analysis error:', error);
       setError(message);
-      toast.error(message);
+      // toast.error(message);
     } finally {
       setIsAnalyzing(false);
     }
