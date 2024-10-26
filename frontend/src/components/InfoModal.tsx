@@ -60,7 +60,7 @@ export default function InfoModal({ onClose }: InfoModalProps) {
               <p className='text-xl mb-3'>🎯 How to Use</p>
               <ol className='list-decimal pl-5 space-y-2 text-white/80'>
                 <li>Draw or write your math problem on the canvas</li>
-                <li>Click the 'Analyze' button</li>
+                <li>Click the &apos;Analyze&apos; button</li>
                 <li>Get instant results and explanations!</li>
               </ol>
             </div>
