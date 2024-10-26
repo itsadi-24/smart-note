@@ -1,6 +1,10 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 
+interface IntroAnimationProps {
+  onAnimationComplete: () => void;
+}
+
 export default function IntroAnimation({
   onAnimationComplete,
 }: IntroAnimationProps) {
