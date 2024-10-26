@@ -73,7 +73,7 @@ export default function IntroAnimation({
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.8 }}
           >
-            Smart Calculator
+            Smart Note
           </motion.h1>
 
           <motion.div
@@ -84,7 +84,7 @@ export default function IntroAnimation({
           >
             <span>Draw</span>
             <span>•</span>
-            <span>Calculate</span>
+            <span>Analyse</span>
             <span>•</span>
             <span>Create</span>
           </motion.div>
