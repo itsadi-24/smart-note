@@ -275,7 +275,8 @@ export default function Canvas() {
   };
 
   // In Canvas.tsx, modify the analyzeDrawing function:
-
+  const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/analyze`;
+  // const apiUrl = 'http://localhost:8080';
   const analyzeDrawing = async () => {
     const canvas = canvasRef.current;
     if (!canvas) {
@@ -291,8 +292,7 @@ export default function Canvas() {
 
       // Log the request
       // console.log('Sending request to backend...');
-
-      const response = await fetch('http://localhost:8080/analyze', {
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
