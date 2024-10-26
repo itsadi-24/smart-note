@@ -8,18 +8,32 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        heading: ['Cal Sans', 'Inter', 'sans-serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+      },
       animation: {
-        'fade-in': 'fadeIn 0.3s ease-in-out',
+        gradient: 'gradient 8s linear infinite',
+        float: 'float 6s ease-in-out infinite',
       },
       keyframes: {
-        fadeIn: {
-          '0%': { opacity: '0', transform: 'translate(-50%, -20px)' },
-          '100%': { opacity: '1', transform: 'translate(-50%, 0)' },
+        gradient: {
+          '0%, 100%': {
+            'background-size': '200% 200%',
+            'background-position': 'left center',
+          },
+          '50%': {
+            'background-size': '200% 200%',
+            'background-position': 'right center',
+          },
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-20px)' },
         },
       },
-      colors: {
-        background: 'var(--background)',
-        foreground: 'var(--foreground)',
+      backdropBlur: {
+        xs: '2px',
       },
     },
   },

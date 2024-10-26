@@ -51,14 +51,14 @@ export default function Canvas() {
   const [showIntro, setShowIntro] = useState(true);
 
   // Use localStorage to check if it's the first visit
-  useEffect(() => {
-    const hasVisited = localStorage.getItem('hasVisited');
-    if (hasVisited) {
-      setShowIntro(false);
-    } else {
-      localStorage.setItem('hasVisited', 'true');
-    }
-  }, []);
+  // useEffect(() => {
+  //   const hasVisited = localStorage.getItem('hasVisited');
+  //   if (hasVisited) {
+  //     setShowIntro(false);
+  //   } else {
+  //     localStorage.setItem('hasVisited', 'true');
+  //   }
+  // }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;

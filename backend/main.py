@@ -91,16 +91,21 @@ async def analyze_image(request: ImageRequest):
         
         # Prepare the prompt
         prompt = """
-Analyze this image and provide a natural, conversational response that:
+Analyze this image and respond naturally, as if you’re explaining to someone in simple terms. Tailor your response based on the type of image:
 
-1. Directly states what you see in the image
-2. If it's a math problem, solve it and explain briefly how you got the answer
-3. If it's text, explain what it means
-4. If it's a drawing, describe what it shows
-5. Provide the answer or conclusion in simple terms
+1. **General Scene**: Describe what is happening, who or what is in the scene, and any key details that stand out.
+2. **Math Problem**: Solve it, briefly outline your approach, and explain the answer step-by-step.
+3. **Text (Short or Long)**: Summarize the meaning and tone. For longer text, focus on main points and skip less important details.
+4. **Chart or Graph**: Describe the type of chart, main trends, and any noticeable peaks or dips.
+5. **Diagram**: Explain the components and their relationships in a simple way, clarifying any processes involved.
+6. **Drawing, Artwork, or Abstract Image**: Describe the scene, style, or mood, and what it might represent or evoke.
+7. **Map**: Identify the location and highlight any specific points, regions, or markers that stand out.
+8. **Scientific Data or Formula**: Break down the key elements, explain the variables and operations, and summarize the results or insights in plain language.
+9. **Handwritten Notes or Scanned Documents**: Describe the content, any legibility issues, and key takeaways.
 
-Please respond naturally, as if you're explaining to someone, without any special formatting or sections. Focus on clarity and simplicity.
+Keep your response conversational, clear, and straightforward. Avoid complex language and focus on simplicity, as if explaining to a friend.
 """
+
 
         # Generate response using Gemini
         logger.info("Sending request to Gemini AI")
