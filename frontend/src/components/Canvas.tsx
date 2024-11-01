@@ -304,7 +304,7 @@ export default function Canvas() {
 
     try {
       const imageData = canvas.toDataURL('image/png');
-      console.log('Sending request to:', `${apiUrl}/analyze`); // Debug log
+      console.log('Sending request to:', `${apiUrl}/analyze`);
 
       const response = await fetch(`${apiUrl}/analyze`, {
         method: 'POST',
@@ -323,13 +323,14 @@ export default function Canvas() {
         throw new Error(data.error);
       }
 
-      // Handle successful response
       setResult(data.result);
       toast.success('Analysis complete!');
-    } catch (err) {
-      console.error('Analysis error:', err);
-      setError(err.message || 'Failed to analyze drawing');
-      toast.error('Failed to analyze drawing');
+    } catch (error: unknown) {
+      console.error('Analysis error:', error);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to analyze drawing';
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsAnalyzing(false);
     }
