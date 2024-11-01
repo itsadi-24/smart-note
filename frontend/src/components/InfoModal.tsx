@@ -23,7 +23,7 @@ export default function InfoModal({ onClose }: InfoModalProps) {
         <div className='overflow-y-auto p-6 custom-scrollbar'>
           <div className='text-white/90 space-y-6 text-lg'>
             <div>
-              <p className='text-xl mb-3'>🎨 Draw, Calculate, Create!</p>
+              <p className='text-xl mb-3'>🎨 Draw, Analyze, Create!</p>
               <p className='text-white/80'>
                 Welcome to your intelligent digital workspace! This smart note
                 brings your handwritten notes to life. ✍️

@@ -14,7 +14,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: 'Smart Note📝',
+  title: 'Smart Note',
   description: 'AI powered Notepad',
 };
 
