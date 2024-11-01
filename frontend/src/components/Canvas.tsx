@@ -59,6 +59,10 @@ export default function Canvas() {
   //     localStorage.setItem('hasVisited', 'true');
   //   }
   // }, []);
+  const apiUrl =
+    process.env.NODE_ENV === 'production'
+      ? process.env.NEXT_PUBLIC_API_URL_PRODUCTION
+      : process.env.NEXT_PUBLIC_API_URL_DEVELOPMENT;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -253,29 +257,35 @@ export default function Canvas() {
 
   const downloadImage = () => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas) {
+      toast.error('Canvas not found');
+      return;
+    }
 
-    const tempCanvas = document.createElement('canvas');
-    tempCanvas.width = canvas.width;
-    tempCanvas.height = canvas.height;
+    try {
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = canvas.width;
+      tempCanvas.height = canvas.height;
+      const ctx = tempCanvas.getContext('2d');
+      if (!ctx) {
+        throw new Error('Could not get canvas context');
+      }
+      ctx.drawImage(canvas, 0, 0);
 
-    const tempCtx = tempCanvas.getContext('2d');
-    if (!tempCtx) return;
+      const link = document.createElement('a');
+      link.download = 'smart-calculator-drawing.png';
+      link.href = tempCanvas.toDataURL('image/png');
+      link.click();
 
-    tempCtx.fillStyle = 'white';
-    tempCtx.fillRect(0, 0, canvas.width, canvas.height);
-    tempCtx.drawImage(canvas, 0, 0);
-
-    const link = document.createElement('a');
-    link.download = 'smart-calculator-drawing.png';
-    link.href = tempCanvas.toDataURL('image/png');
-    link.click();
-
-    toast.success('Image downloaded successfully!');
+      toast.success('Image downloaded successfully!');
+    } catch (err) {
+      console.error('Download error:', err);
+      toast.error('Failed to download image');
+    }
   };
 
   // In Canvas.tsx, modify the analyzeDrawing function:
-  const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/analyze`;
+  // const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/analyze`;
   // const apiUrl = 'http://localhost:8080';
   const analyzeDrawing = async () => {
     const canvas = canvasRef.current;
@@ -284,15 +294,19 @@ export default function Canvas() {
       return;
     }
 
+    if (!apiUrl) {
+      toast.error('API URL not configured');
+      return;
+    }
+
     setIsAnalyzing(true);
     setError(null);
 
     try {
       const imageData = canvas.toDataURL('image/png');
+      console.log('Sending request to:', `${apiUrl}/analyze`); // Debug log
 
-      // Log the request
-      // console.log('Sending request to backend...');
-      const response = await fetch(apiUrl, {
+      const response = await fetch(`${apiUrl}/analyze`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -300,28 +314,22 @@ export default function Canvas() {
         body: JSON.stringify({ imageData }),
       });
 
-      // Log the response status
-      // console.log('Response status:', response.status);
-
-      const data = await response.json();
-      console.log('Response data:', data);
-
       if (!response.ok) {
-        throw new Error(data.error || 'Analysis failed');
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
+      const data = await response.json();
       if (data.error) {
         throw new Error(data.error);
       }
 
+      // Handle successful response
       setResult(data.result);
-      // toast.success('Analysis completed!');
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : 'Error analyzing image';
-      console.error('Analysis error:', error);
-      setError(message);
-      // toast.error(message);
+      toast.success('Analysis complete!');
+    } catch (err) {
+      console.error('Analysis error:', err);
+      setError(err.message || 'Failed to analyze drawing');
+      toast.error('Failed to analyze drawing');
     } finally {
       setIsAnalyzing(false);
     }
