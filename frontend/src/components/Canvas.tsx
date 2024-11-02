@@ -49,7 +49,7 @@ export default function Canvas() {
   const [error, setError] = useState<string | null>(null);
   const [showInfo, setShowInfo] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
-
+  const [hasShownAlert, setHasShownAlert] = useState(false);
   // Use localStorage to check if it's the first visit
   // useEffect(() => {
   //   const hasVisited = localStorage.getItem('hasVisited');
@@ -59,6 +59,30 @@ export default function Canvas() {
   //     localStorage.setItem('hasVisited', 'true');
   //   }
   // }, []);
+  useEffect(() => {
+    if (hasShownAlert) return;
+
+    const timer = setTimeout(() => {
+      toast(
+        'Please note: The first request may take 1-2 minutes as the backend server starts up. Please refresh the page after waiting.Thanks for your patience!',
+        {
+          duration: 10000, // 10 seconds
+          position: 'top-center',
+          style: {
+            background: '#1a1a1a',
+            color: '#fff',
+            borderRadius: '8px',
+            padding: '16px',
+            fontSize: '16px',
+          },
+        }
+      );
+      setHasShownAlert(true);
+      // console.log('Toast shown');
+    }, 15000);
+
+    return () => clearTimeout(timer);
+  }, [hasShownAlert]);
   const apiUrl =
     process.env.NODE_ENV === 'production'
       ? process.env.NEXT_PUBLIC_API_URL_PRODUCTION
