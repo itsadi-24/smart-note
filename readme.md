@@ -43,6 +43,7 @@ Before running this project, make sure you have:
 - Google Gemini API Key
 
 The frontend will be available at http://localhost:3000
+
 🎯 Usage
 
 Access the application through your web browser at http://localhost:3000
