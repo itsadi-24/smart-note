@@ -1,4 +1,3 @@
-// components/ColorSwatch.tsx
 import { ColorSwatchProps } from '@/types';
 
 export default function ColorSwatch({
